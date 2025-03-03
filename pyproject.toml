@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "cmrad-user-institution-api"
+version = "0.1.0"
+description = ""
+authors = ["Joe Hopkinson <joe@hopkinson.co.uk>"]
+readme = "README.md"
+
+packages = [
+    { include = "cmrad_user_institution_api", from="src"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.115.9"
+uvicorn = "^0.34.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.6.0"
+flake8 = "^4.0.1"
+isort = "^5.10.1"
+mypy = "^1.0.0"
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
