@@ -4,6 +4,9 @@ format:
 	isort .
 	black .
 
+make lint:
+	mypy src/
+
 run:
 	docker-compose build
 	docker-compose up
