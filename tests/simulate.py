@@ -117,6 +117,9 @@ def run_simulation():
     time.sleep(1)
 
     # Create second primary user-institution relation (will fail if user already has a primary institution)
+    print(
+        f"Attempting to create a second primary user-institution relation for user {user_id}. (Should fail)"
+    )
     response = create_user_institution_relation(
         user_id, institution3_institution_id, is_primary=True
     )
