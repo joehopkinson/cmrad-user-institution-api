@@ -7,5 +7,6 @@ RUN poetry config virtualenvs.create false
 
 COPY pyproject.toml poetry.lock README.md ./
 COPY src/ ./src/
+COPY tests/ ./tests/
 
 RUN poetry install --no-interaction --no-ansi

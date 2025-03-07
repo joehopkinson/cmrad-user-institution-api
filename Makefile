@@ -4,9 +4,14 @@ format:
 	isort .
 	black .
 
-make lint:
-	mypy src/
-
 run:
 	docker-compose build
 	docker-compose up
+
+test:
+	pytest tests/unit
+
+simulate:
+	docker-compose build
+	docker-compose up -d
+	python tests/simulate.py
