@@ -7,7 +7,7 @@ class Repository(ABC):
         pass
 
     @abstractmethod
-    def get(self, id: str) -> Optional[Any]:
+    def get(self, **kwargs) -> Optional[Any]:
         raise NotImplementedError
 
     @abstractmethod
@@ -19,5 +19,9 @@ class Repository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, id: str, data: Any) -> Optional[Any]:
+    def update(self, **kwargs) -> Optional[Any]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete(self, entity: Any) -> None:
         raise NotImplementedError

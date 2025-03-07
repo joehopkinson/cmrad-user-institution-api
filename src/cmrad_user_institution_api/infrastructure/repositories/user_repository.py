@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlmodel import Session, select
 
-from cmrad_user_institution_api.domain import user_entity
+from cmrad_user_institution_api.domain import user as user_entity
 from cmrad_user_institution_api.infrastructure import models
 from cmrad_user_institution_api.infrastructure.repositories import abstract_repository
 
@@ -34,7 +34,6 @@ class UserRepository(abstract_repository.Repository):
             for key, value in updated_fields.items():
                 if hasattr(user_orm, key) and value is not None:
                     setattr(user_orm, key, value)
-
             self._session.commit()
             self._session.refresh(user_orm)
             return user_entity.User(**user_orm.model_dump())

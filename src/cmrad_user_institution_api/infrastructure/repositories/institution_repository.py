@@ -1,8 +1,8 @@
 from typing import Optional
 
-from sqlmodel import Session, select
+from sqlmodel import Session, func, select
 
-from cmrad_user_institution_api.domain import institution_entity
+from cmrad_user_institution_api.domain import institution as institution_entity
 from cmrad_user_institution_api.infrastructure import models
 from cmrad_user_institution_api.infrastructure.repositories import abstract_repository
 
@@ -12,18 +12,41 @@ class InstitutionRepository(abstract_repository.Repository):
         super().__init__()
         self._session = session
 
+    @staticmethod
+    def _user_count_query(institution_id: Optional[str] = None) -> select:
+        query = (
+            select(
+                models.InstitutionORM,
+                func.count(models.UserInstitutionORM.user_id).label("user_count"),
+            )
+            .join(
+                models.UserInstitutionORM,
+                models.UserInstitutionORM.institution_id  # type: ignore
+                == models.InstitutionORM.institution_id,
+                isouter=True,
+            )
+            .group_by(models.InstitutionORM.institution_id)
+        )
+        if institution_id:
+            query = query.where(models.InstitutionORM.institution_id == institution_id)
+        return query
+
     def get(self, institution_id: str) -> Optional[institution_entity.Institution]:
-        if institution_id_orm := self._session.get(
-            models.InstitutionORM, institution_id
-        ):
-            return institution_entity.Institution(**institution_id_orm.model_dump())
+        if result := self._session.exec(self._user_count_query(institution_id)).first():
+            institution_orm, user_count = result
+            return institution_entity.Institution(
+                **institution_orm.model_dump(), user_count=user_count
+            )
         return None
 
     def get_all(self) -> list[institution_entity.Institution]:
-        institution_orms = self._session.exec(select(models.InstitutionORM)).all()
         return [
-            institution_entity.Institution(**institution_orm.model_dump())
-            for institution_orm in institution_orms
+            institution_entity.Institution(
+                **institution_orm.model_dump(), user_count=user_count
+            )
+            for institution_orm, user_count in self._session.exec(
+                self._user_count_query()
+            ).all()
         ]
 
     def add(self, institution: institution_entity.Institution) -> None:
@@ -39,7 +62,6 @@ class InstitutionRepository(abstract_repository.Repository):
             for key, value in updated_fields.items():
                 if hasattr(institution_orm, key) and value is not None:
                     setattr(institution_orm, key, value)
-
             self._session.commit()
             self._session.refresh(institution_orm)
             return institution_entity.Institution(**institution_orm.model_dump())

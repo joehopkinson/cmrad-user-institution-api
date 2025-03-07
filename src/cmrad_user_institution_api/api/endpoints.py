@@ -1,6 +1,9 @@
+from typing import Optional
+
 import fastapi
 
 from cmrad_user_institution_api.api import dependencies, models
+from cmrad_user_institution_api.app import exceptions
 from cmrad_user_institution_api.app import institution_service as institution
 from cmrad_user_institution_api.app import user_service as user
 
@@ -19,7 +22,9 @@ def create_user(
     user_service: user.UserService = fastapi.Depends(dependencies.get_user_service),
 ) -> models.CreateUserResponse:
     user_id = user_service.create_new_user(request)
-    return models.CreateUserResponse(message=f"User created with id: {user_id}")
+    return models.CreateUserResponse(
+        message="User created successfully", user_id=user_id
+    )
 
 
 @app.get(
@@ -41,11 +46,14 @@ def get_users(
 def get_user(
     user_id: str,
     user_service: user.UserService = fastapi.Depends(dependencies.get_user_service),
-) -> models.GetUserResponse:
-    user_entity = user_service.get_user(user_id)
-    if not user_entity:
+) -> Optional[models.GetUserResponse]:
+    try:
+        user_entity = user_service.get_user(user_id)
+        return user_entity
+    except exceptions.UserNotFoundError:
         raise fastapi.HTTPException(status_code=404, detail="User not found")
-    return user_entity
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
 
 
 @app.patch(
@@ -57,11 +65,16 @@ def update_user(
     user_id: str,
     request: models.UpdateUserRequest,
     user_service: user.UserService = fastapi.Depends(dependencies.get_user_service),
-) -> models.GetUserResponse:
-    user_entity = user_service.update_user(user_id, request)
-    if not user_entity:
+) -> Optional[models.GetUserResponse]:
+    try:
+        user_entity = user_service.update_user(user_id, request)
+        return user_entity
+    except exceptions.UserNotFoundError:
         raise fastapi.HTTPException(status_code=404, detail="User not found")
-    return user_entity
+    except exceptions.UserUpdateError:
+        raise fastapi.HTTPException(status_code=400, detail="Invalid update request")
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
 
 
 @app.delete(
@@ -72,8 +85,12 @@ def delete_user(
     user_id: str,
     user_service: user.UserService = fastapi.Depends(dependencies.get_user_service),
 ) -> None:
-    if not user_service.delete_user(user_id):
+    try:
+        user_service.delete_user(user_id)
+    except exceptions.UserNotFoundError:
         raise fastapi.HTTPException(status_code=404, detail="User not found")
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
 
 
 @app.post(
@@ -86,10 +103,10 @@ def create_institution(
     institution_service: institution.InstitutionService = fastapi.Depends(
         dependencies.get_institution_service
     ),
-) -> models.CreateUserResponse:
+) -> models.CreateInstitutionResponse:
     institution_id = institution_service.create_new_institution(request)
-    return models.CreateUserResponse(
-        message=f"Institution created with id: {institution_id}"
+    return models.CreateInstitutionResponse(
+        message="Institution created successfully", institution_id=institution_id
     )
 
 
@@ -116,11 +133,14 @@ def get_institution(
     institution_service: institution.InstitutionService = fastapi.Depends(
         dependencies.get_institution_service
     ),
-) -> models.GetInstitutionResponse:
-    institution_entity = institution_service.get_institution(institution_id)
-    if not institution_entity:
+) -> Optional[models.GetInstitutionResponse]:
+    try:
+        institution_entity = institution_service.get_institution(institution_id)
+        return institution_entity
+    except exceptions.InstitutionNotFoundError:
         raise fastapi.HTTPException(status_code=404, detail="Institution not found")
-    return institution_entity
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
 
 
 @app.patch(
@@ -134,11 +154,18 @@ def update_institution(
     institution_service: institution.InstitutionService = fastapi.Depends(
         dependencies.get_institution_service
     ),
-) -> models.GetInstitutionResponse:
-    institution_entity = institution_service.update_institution(institution_id, request)
-    if not institution_entity:
+) -> Optional[models.GetInstitutionResponse]:
+    try:
+        institution_entity = institution_service.update_institution(
+            institution_id, request
+        )
+        return institution_entity
+    except exceptions.InstitutionNotFoundError:
         raise fastapi.HTTPException(status_code=404, detail="Institution not found")
-    return institution_entity
+    except exceptions.InstitutionUpdateError:
+        raise fastapi.HTTPException(status_code=400, detail="Invalid update request")
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
 
 
 @app.delete(
@@ -151,5 +178,61 @@ def delete_institution(
         dependencies.get_institution_service
     ),
 ) -> None:
-    if not institution_service.delete_institution(institution_id):
+    try:
+        institution_service.delete_institution(institution_id)
+    except exceptions.InstitutionNotFoundError:
         raise fastapi.HTTPException(status_code=404, detail="Institution not found")
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(
+    "/users/{user_id}/institutions/{institution_id}",
+    status_code=201,
+)
+def add_user_institution_association(
+    user_id: str,
+    institution_id: str,
+    request: models.AddUserInstitutionAssociationRequest,
+    user_service: user.UserService = fastapi.Depends(dependencies.get_user_service),
+) -> models.AddUserInstitutionAssociationResponse:
+    try:
+        user_service.add_user_institution_association(user_id, institution_id, request)
+    except exceptions.UserNotFoundError:
+        raise fastapi.HTTPException(status_code=404, detail="User not found")
+    except exceptions.InstitutionNotFoundError:
+        raise fastapi.HTTPException(status_code=404, detail="Institution not found")
+    except exceptions.ExistingUserInstitutionAssociationError:
+        raise fastapi.HTTPException(
+            status_code=409, detail="User-institution association already exists"
+        )
+    except exceptions.InvalidUserInstitutionAssociationError:
+        raise fastapi.HTTPException(
+            status_code=400, detail="Invalid user-institution association"
+        )
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
+    return models.AddUserInstitutionAssociationResponse(
+        message="Association created successfully",
+        user_id=user_id,
+        institution_id=institution_id,
+    )
+
+
+@app.get(
+    "/users/{user_id}/institutions",
+    status_code=200,
+    response_model=models.GetUserInstitutionAssociationResponse,
+)
+def get_user_institution_associations(
+    user_id: str,
+    user_service: user.UserService = fastapi.Depends(dependencies.get_user_service),
+) -> models.GetUserInstitutionAssociationResponse:
+    try:
+        return user_service.get_user_institution_associations(user_id)
+    except exceptions.UserNotFoundError:
+        raise fastapi.HTTPException(status_code=404, detail="User not found")
+    except exceptions.InstitutionNotFoundError:
+        raise fastapi.HTTPException(status_code=404, detail="Institution not found")
+    except Exception as e:
+        raise fastapi.HTTPException(status_code=500, detail=str(e))
