@@ -2,13 +2,13 @@ from typing import Optional
 
 import fastapi
 
-from cmrad_user_institution_api.api import dependencies, models
-from cmrad_user_institution_api.app import exceptions
-from cmrad_user_institution_api.app import institution_service as institution
-from cmrad_user_institution_api.app import user_service as user
+from user_institution_api.api import dependencies, models
+from user_institution_api.app import exceptions
+from user_institution_api.app import institution_service as institution
+from user_institution_api.app import user_service as user
 
 app = fastapi.FastAPI(
-    title="CMRAD User Institution API",
+    title="User Institution API",
 )
 
 

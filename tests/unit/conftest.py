@@ -2,8 +2,8 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, StaticPool, create_engine
 
-from cmrad_user_institution_api.api.endpoints import app
-from cmrad_user_institution_api.infrastructure import database
+from user_institution_api.api.endpoints import app
+from user_institution_api.infrastructure import database
 
 client = TestClient(app)
 engine = create_engine(

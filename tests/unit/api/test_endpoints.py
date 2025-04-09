@@ -3,8 +3,8 @@ from unittest import mock
 
 import pytest
 
-from cmrad_user_institution_api.api import models
-from cmrad_user_institution_api.infrastructure import models as orm_models
+from user_institution_api.api import models
+from user_institution_api.infrastructure import models as orm_models
 
 
 @pytest.fixture
@@ -53,7 +53,7 @@ def create_association(session, user_id, institution_id, is_primary):
     return association_orm
 
 
-@mock.patch("cmrad_user_institution_api.domain.user.uuid.uuid4")
+@mock.patch("user_institution_api.domain.user.uuid.uuid4")
 def test_create_user(mock_uuid, mock_client, mock_session, mock_user_event):
     user_id = str(uuid.uuid4())
     mock_uuid.return_value = user_id

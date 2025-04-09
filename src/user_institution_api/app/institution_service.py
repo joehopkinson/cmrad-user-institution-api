@@ -1,11 +1,9 @@
 from typing import Optional
 
-from cmrad_user_institution_api.api import models
-from cmrad_user_institution_api.app import exceptions
-from cmrad_user_institution_api.domain import institution as institution_entity
-from cmrad_user_institution_api.infrastructure.repositories import (
-    institution_repository,
-)
+from user_institution_api.api import models
+from user_institution_api.app import exceptions
+from user_institution_api.domain import institution as institution_entity
+from user_institution_api.infrastructure.repositories import institution_repository
 
 
 class InstitutionService:

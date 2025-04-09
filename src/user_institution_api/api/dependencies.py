@@ -1,9 +1,9 @@
 import fastapi
 from sqlmodel import Session
 
-from cmrad_user_institution_api.app import institution_service, user_service
-from cmrad_user_institution_api.infrastructure import database
-from cmrad_user_institution_api.infrastructure.repositories import (
+from user_institution_api.app import institution_service, user_service
+from user_institution_api.infrastructure import database
+from user_institution_api.infrastructure.repositories import (
     institution_repository,
     user_institution_repository,
     user_repository,

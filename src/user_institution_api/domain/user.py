@@ -1,7 +1,7 @@
 import uuid
 
-from cmrad_user_institution_api.domain import models
-from cmrad_user_institution_api.domain import (
+from user_institution_api.domain import models
+from user_institution_api.domain import (
     user_institution_association as user_institution_association_entity,
 )
 

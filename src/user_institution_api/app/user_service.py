@@ -1,12 +1,12 @@
 from typing import Optional
 
-from cmrad_user_institution_api.api import models
-from cmrad_user_institution_api.app import exceptions
-from cmrad_user_institution_api.domain import user as user_entity
-from cmrad_user_institution_api.domain import (
+from user_institution_api.api import models
+from user_institution_api.app import exceptions
+from user_institution_api.domain import user as user_entity
+from user_institution_api.domain import (
     user_institution_association as user_institution_association_entity,
 )
-from cmrad_user_institution_api.infrastructure.repositories import (
+from user_institution_api.infrastructure.repositories import (
     institution_repository,
     user_institution_repository,
     user_repository,

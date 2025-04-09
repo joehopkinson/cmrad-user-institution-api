@@ -2,9 +2,9 @@ from typing import Any, Optional
 
 from sqlmodel import Session, select
 
-from cmrad_user_institution_api.domain import user_institution_association
-from cmrad_user_institution_api.infrastructure import models
-from cmrad_user_institution_api.infrastructure.repositories import abstract_repository
+from user_institution_api.domain import user_institution_association
+from user_institution_api.infrastructure import models
+from user_institution_api.infrastructure.repositories import abstract_repository
 
 
 class UserInstitutionRepository(abstract_repository.Repository):

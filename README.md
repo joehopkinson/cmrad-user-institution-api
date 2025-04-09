@@ -1,4 +1,4 @@
-# cmrad-user-institution-api
+# user-institution-api
 
 ## Summary
 
@@ -51,7 +51,7 @@ This is a simple API that facilitates the management of users and institutions a
 * POST `users/{user_id}/institutions/{institution_id}`
 * GET `users/{user_id}/institutions/{institution_id}`
 
-See `src/cmrad_user_institution_api/api/models.py` for request and response models. 
+See `src/user_institution_api/api/models.py` for request and response models. 
 
 ## Important Design Decisions
 * Implemented following a Domain Driven Design (DDD) approach
